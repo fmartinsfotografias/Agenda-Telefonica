@@ -1,11 +1,18 @@
 
-
-
 //Inicialização
+using Agenda;
+using System.Text.RegularExpressions;
+
+
+//Condições de finalização de laços
 int finalizacao = 1;
+int sair_tudo = 0;
+int sair_email = 0;
+int sair_telefone = 0;
+int final = 0;
+
 while (finalizacao == 1)
 {
-
     Console.WriteLine("MINHA AGENDA TELEFONICA");
     Console.WriteLine("=======================================");
     Console.WriteLine("Seja bem vindo(a)");
@@ -13,80 +20,94 @@ while (finalizacao == 1)
     Console.WriteLine("1 - CADASTRAR NOVO CONTATO | 2 - BUSCAR CONTATO");
     string resposta = Console.ReadLine();
 
-    // Cadastros
-    string nome = "";
-    string telefone = "";
-    string email = "";
-
-
-    //Condição de saida da agenda
-    int sair = 0;
-
     // Condição para cadastrar novo contato
     if (resposta == "1")
-
     {
-        while (resposta == "1")
+        while (sair_tudo == 0)
         {
             //Cadastro para salvamento
+            Contato conta1 = new Contato();
             Console.WriteLine("Nome: ");
-            nome = Console.ReadLine();
-            Console.WriteLine("Telefone: ");
-            telefone = Console.ReadLine();
-            Console.WriteLine("E-mail: ");
-            email = Console.ReadLine();
-            // Confirmação para Salvamento
-            Console.WriteLine("=======================================");
-            Console.WriteLine("Dados Adicionados a sua Agenda: ");
-            Console.WriteLine("Nome: " + nome);
-            Console.WriteLine("Telefone: " + telefone);
-            Console.WriteLine("E-mail: " + email);
-            Console.WriteLine("DESEJA SALVAR: \r\n1 - SIM | 2 - NÂO");
-            int salvar = Int32.Parse(Console.ReadLine());
-            if (salvar == 1)
+            conta1.nome = Console.ReadLine();
+            //Validar Telefone
+            while (sair_telefone == 0)
             {
-                try
+                Console.WriteLine("Telefone: ");
+                conta1.telefone = Console.ReadLine();
+                if (conta1.telefone.Length == 11)
                 {
-                    Dictionary<string, string> agenda = new Dictionary<string, string>();
-                    {
-                        agenda.Add("Nome: ", nome);
-                        agenda.Add("Telefone: ", telefone);
-                        agenda.Add("E-mail: ", email);
-                    };
+                    sair_telefone = 1;
+                }
+                else
+                {
+                    Console.WriteLine("Telefone inválido!!!");
+                    Console.WriteLine("Ex: DDD = 47 numero = 9885012555");
+                }
+            }
+            //Validar Email
+            while (sair_email == 0)
+            {
+                Console.WriteLine("E-mail: ");
+                conta1.email = Console.ReadLine();
+                Regex rg = new Regex(@"^[A-Za-z0-9](([_\.\-]?[a-zA-Z0-9]+)*)@([A-Za-z0-9]+)(([\.\-]?[a-zA-Z0-9]+)*)\.([A-Za-z]{2,})$");
+                if (rg.IsMatch(conta1.email))
+                {
+                    Console.WriteLine("Email valido");
+                    sair_email = 1;
+                }
+                else
+                {
+                    Console.WriteLine("Email Invalido");
+                }
 
-                    foreach (var (key, value) in agenda)
+                //Confirmação para Salvamento
+                Console.WriteLine("=======================================");
+                Console.WriteLine("Dados Adicionados a sua Agenda: ");
+                Console.WriteLine("Nome: " + conta1.nome);
+                Console.WriteLine("Telefone: " + conta1.telefone);
+                Console.WriteLine("E-mail: " + conta1.email);
+                Console.WriteLine("DESEJA SALVAR: \r\n1 - SIM | 2 - NÂO");
+                int salvar = Int32.Parse(Console.ReadLine());
+                if (salvar == 1)
+                {
+                    try
                     {
-                        StreamWriter sw = File.AppendText("D:\\agenda.txt");
-                        sw.WriteLine(key + value);
-                        sw.Close();
+                        Dictionary<string, string> agenda = new Dictionary<string, string>();
+                        {
+                            agenda.Add("Nome: ", conta1.nome);
+                            agenda.Add("Telefone: ", conta1.telefone);
+                            agenda.Add("E-mail: ", conta1.email);
+                        };
+
+                        foreach (var (key, value) in agenda)
+                        {
+                            StreamWriter sw = File.AppendText("D:\\agenda.txt");
+                            sw.WriteLine(key + value);
+                            sw.Close();
+                        }
+                        Console.WriteLine("Salvo com Sucesso !!!");
+                        break;
+
+
                     }
-
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception: " + e.Message);
+                    }
+                    finally
+                    {
+                        Console.WriteLine("Executing finally Block");
+                    }
                 }
-                catch (Exception e)
+                else
                 {
-                    Console.WriteLine("Exception: " + e.Message);
+                    Console.WriteLine("Seu Contato não foi salvo");
                 }
-                finally
-                {
-                    Console.WriteLine("Executing finally Block");
-                }
+
             }
-            else
-            {
-                Console.WriteLine("Seu Contato não foi salvo");
-            }
-            Console.WriteLine("Salvo com Sucesso !!!");
 
-            Console.WriteLine("Salvar outro contato? \r\n1 - SIM \r\n2 - NÃO");
-            finalizacao = Int32.Parse(Console.ReadLine());
-            if (finalizacao == 2)
-                break;
-        }
-
-    }
-
-    //Condição para fazer a busca por contato
-    if (resposta == "2")
+            //Condição para fazer a busca por contato
+    if (resposta == "2") 
     {
         while (resposta == "2")
         {
@@ -114,11 +135,17 @@ while (finalizacao == 1)
         }
     }
 
-    Console.WriteLine("Deseja voltar ao inicio?");
-    Console.WriteLine("1 - VOLTAR AO INICIO | 2 - FECHAR DA AGENDA");
-    finalizacao = Int32.Parse(Console.ReadLine());
-    if (finalizacao == 2)
-        break;
+Console.WriteLine("Deseja voltar ao inicio?");
+Console.WriteLine("1 - VOLTAR AO INICIO | 2 - FECHAR DA AGENDA");
+resposta = "1";
+sair_email = 0;
+sair_telefone = 0;
+sair_tudo = 0;
+finalizacao = Int32.Parse(Console.ReadLine());
+if (finalizacao == 2)
+    break;
 
 }
 Console.WriteLine("Fechando sua Agenda...");
+}
+}
